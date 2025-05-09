@@ -1,28 +1,19 @@
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import React, { useState } from "react";
-import { axiosInstance } from "@/routes/parties";
-import type { Candidate } from "@/routes/parties";
+import React from "react";
+import type { Candidate } from "@/routes/parties.$partyID";
 
 export function PartiesPage({
   candidates,
+  handleVote,
+  message,
   className,
   ...props
 }: {
   candidates: Candidate[];
+  handleVote: (candidate: string) => void;
+  message: string;
 } & React.ComponentProps<"div">) {
-  const [message, setMessage] = useState("");
-
-  // Handle vote submission
-  const handleVote = async (candidate: string) => {
-    try {
-      const response = await axiosInstance.post("/vote", { candidate });
-      setMessage(response.data.message);
-    } catch (error) {
-      setMessage("Failed to register vote.");
-    }
-  };
-
   return (
     <div
       className={cn(
