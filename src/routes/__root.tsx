@@ -14,7 +14,7 @@ export const Route = createRootRoute({
         <Link to="/auth" className="[&.active]:font-bold">
           Log in
         </Link>
-        <Link to="/parties" className="[&.active]:font-bold">
+        <Link to="/parties/2025-05-10" className="[&.active]:font-bold">
           Parties
         </Link>
       </div>
@@ -23,4 +23,4 @@ export const Route = createRootRoute({
       <TanStackRouterDevtools />
     </>
   ),
-})
+});
