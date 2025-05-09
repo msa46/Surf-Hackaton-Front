@@ -1,4 +1,15 @@
 // src/qkd-client/QKD014Client.ts
+
+interface StatusResponse {
+    status: string;
+    message: string;
+}
+
+interface KeyResponse {
+    keyId: string;
+    keyData: string;
+}
+
 interface QKDConfig {
     certPath: string;
     keyPath: string;
@@ -39,7 +50,7 @@ export class QKD014Client {
 
             }
         } catch (error) {
-            throw new Error(`Failed to load certificates: ${error.message}`);
+            throw new Error(`Failed to load certificates: ${error}`);
         }
     }
 
@@ -48,22 +59,24 @@ export class QKD014Client {
         path: string,
         body?: any
     ): Promise<T> {
+
+        await this.loadCertificates();
+
+        if (!this.cert || !this.key) {
+            throw new Error('Certificates not loaded');
+        }
+        
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
 
         try {
             // Create credentials object
-            const credentials = await this.createCredentials();
-
             const headers = new Headers({
                 'Content-Type': 'application/json',
-                'X-Client-Cert': await this.blobToBase64(this.certBlob),
-                'X-Client-Key': await this.blobToBase64(this.keyBlob),
+                'X-Client-Cert': btoa(this.cert),
+                'X-Client-Key': btoa(this.key),
             });
 
-            if (this.caBlob) {
-                headers.append('X-CA-Cert', await this.blobToBase64(this.caBlob));
-            }
 
             const response = await fetch(`${this.baseUrl}${path}`, {
                 method,
@@ -83,42 +96,9 @@ export class QKD014Client {
         }
     }
 
-    private async blobToBase64(blob: Blob): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (typeof reader.result === 'string') {
-                    resolve(reader.result.split(',')[1]);
-                } else {
-                    reject(new Error('Failed to convert blob to base64'));
-                }
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    }
 
-    private async loadCertificates() {
-        try {
-            // Load certificates if not already loaded
-            if (!this.cert || !this.key) {
-                const [certResponse, keyResponse] = await Promise.all([
-                    fetch(this.config.certPath),
-                    fetch(this.config.keyPath)
-                ]);
 
-                this.cert = await certResponse.text();
-                this.key = await keyResponse.text();
 
-                if (this.config.caPath) {
-                    const caResponse = await fetch(this.config.caPath);
-                    this.ca = await caResponse.text();
-                }
-            }
-        } catch (error) {
-            throw new Error(`Failed to load certificates: ${error.message}`);
-        }
-    }
 
     async getStatus(): Promise<StatusResponse> {
         return this.makeRequest<StatusResponse>('GET', '/api/v1/status');
@@ -139,16 +119,18 @@ export class QKD014Client {
         return this.makeRequest<KeyResponse[]>('POST', '/api/v1/keys', body);
     }
 
-    async getKeyWithKeyIds(
-        keyIds: string[],
-        masterSaeId: string,
-        slaveSaeId: string
-    ): Promise<KeyResponse[]> {
-        const body = {
-            key_IDs: keyIds,
-            master_SAE_ID: masterSaeId,
-            slave_SAE_ID: slaveSaeId,
-        };
-        return this.makeRequest<KeyResponse[]>('POST', '/api/v1/keys/ids', body);
-    }
+
+    // Not needed for now
+    // async getKeyWithKeyIds(
+    //     keyIds: string[],
+    //     masterSaeId: string,
+    //     slaveSaeId: string
+    // ): Promise<KeyResponse[]> {
+    //     const body = {
+    //         key_IDs: keyIds,
+    //         master_SAE_ID: masterSaeId,
+    //         slave_SAE_ID: slaveSaeId,
+    //     };
+    //     return this.makeRequest<KeyResponse[]>('POST', '/api/v1/keys/ids', body);
+    // }
 }
