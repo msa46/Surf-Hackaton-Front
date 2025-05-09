@@ -10,7 +10,7 @@ interface KeyResponse {
     keyData: string;
 }
 
-interface QKDConfig {
+export interface QKDConfig {
     certPath: string;
     keyPath: string;
     caPath?: string;
