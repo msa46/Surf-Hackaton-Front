@@ -7,7 +7,7 @@ export function useQKDClient(config: QKDClientConfig ) {
     const [error, setError] = useState<Error | null>(null);
 
     const client = new QKD014Client(
-        import.meta.env.QKD_API_URL || 'http://localhost:3001',
+        import.meta.env.QKD_API_URL || '192.168.114.1',
         config
     );
 

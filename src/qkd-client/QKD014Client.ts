@@ -1,11 +1,13 @@
 // src/qkd-client/QKD014Client.ts
 
+import axios from "axios";
+
 interface StatusResponse {
     status: string;
     message: string;
 }
 
-interface KeyResponse {
+export interface KeyResponse {
     keyId: string;
     keyData: string;
 }
@@ -71,26 +73,25 @@ export class QKD014Client {
 
         try {
             // Create credentials object
-            const headers = new Headers({
+            const headers = {
                 'Content-Type': 'application/json',
                 'X-Client-Cert': btoa(this.cert),
                 'X-Client-Key': btoa(this.key),
-            });
-
-
-            const response = await fetch(`${this.baseUrl}${path}`, {
+            };
+            axios.defaults.baseURL = '';
+            
+            const response = await axios.post(`http://192.168.114.1:8000/${path}`, {
                 method,
                 headers,
-                body: body ? JSON.stringify(body) : undefined,
                 signal: controller.signal,
-                credentials: 'include',
+                // credentials: 'include',
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP Error: ${response.status} - ${await response.text()}`);
+            if (response.status < 200 || response.status >= 300) {
+                throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
             }
-
-            return response.json();
+            console.log('response:', response.data)
+            return response.data;
         } finally {
             clearTimeout(timeoutId);
         }
@@ -112,11 +113,11 @@ export class QKD014Client {
     ): Promise<KeyResponse[]> {
         const body = {
             key_size: keySize,
-            master_SAE_ID: masterSaeId,
-            slave_SAE_ID: slaveSaeId,
+            // master_SAE_ID: masterSaeId,
+            // slave_SAE_ID: slaveSaeId,
             key_count: keyCount,
         };
-        return this.makeRequest<KeyResponse[]>('POST', '/api/v1/keys', body);
+        return this.makeRequest<KeyResponse[]>('GET', '/api/v1/keys/'+slaveSaeId+'/enc_keys', body);
     }
 
 

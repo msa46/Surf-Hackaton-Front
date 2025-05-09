@@ -11,9 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TestImport } from './routes/test'
 import { Route as PartiesImport } from './routes/parties'
 
 // Create/Update Routes
+
+const TestRoute = TestImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const PartiesRoute = PartiesImport.update({
   id: '/parties',
@@ -32,6 +39,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartiesImport
       parentRoute: typeof rootRoute
     }
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -39,32 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/parties': typeof PartiesRoute
+  '/test': typeof TestRoute
 }
 
 export interface FileRoutesByTo {
   '/parties': typeof PartiesRoute
+  '/test': typeof TestRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/parties': typeof PartiesRoute
+  '/test': typeof TestRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/parties'
+  fullPaths: '/parties' | '/test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/parties'
-  id: '__root__' | '/parties'
+  to: '/parties' | '/test'
+  id: '__root__' | '/parties' | '/test'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   PartiesRoute: typeof PartiesRoute
+  TestRoute: typeof TestRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   PartiesRoute: PartiesRoute,
+  TestRoute: TestRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +96,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/parties"
+        "/parties",
+        "/test"
       ]
     },
     "/parties": {
       "filePath": "parties.tsx"
+    },
+    "/test": {
+      "filePath": "test.tsx"
     }
   }
 }
