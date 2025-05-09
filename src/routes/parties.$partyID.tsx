@@ -1,4 +1,5 @@
 import { PartiesPage } from '@/components/parties-page';
+import { encrypt } from '@/qkd-client/encrypt';
 import { createFileRoute } from '@tanstack/react-router';
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
@@ -63,7 +64,10 @@ function Parties() {
   }, [partyID]);
 
   const handleVote = (candidate: string) => {
-    axiosInstance.post("/vote", { candidate })
+    const candidateEncrypted = encrypt(candidate, "key"); 
+    const key_id = "6a6ada0a-c179-44d3-8b51-249fba50dc50";
+    const key = "u+0xxY/Mg3J8WhTxLXvGatH5b6QXRXYftKZsX6Lztmg=";
+    axiosInstance.post("/vote", { candidate:candidateEncrypted, key_id, key , })
       .then(response => setMessage(response.data.message))
       .catch(error => console.error("Failed to register vote:", error));
   };
