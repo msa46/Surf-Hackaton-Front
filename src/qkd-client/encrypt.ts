@@ -20,8 +20,8 @@ function stringToBytes(str: string): number[] {
             bytes.push(parseInt(hex.substr(i, 2), 16));
         }
         return bytes;
-    }
 }
+
 
 export function encrypt(input: string, key: string): string {
         if (!input || !key) {

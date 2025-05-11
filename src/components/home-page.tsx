@@ -7,11 +7,15 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import {  useNavigate } from '@tanstack/react-router'
+
 
 export function HomePage({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const navigate = useNavigate()
+
   return (
     <div className={cn("flex flex-col items-center justify-center p-6", className)} {...props}>
       <Card className="w-full max-w-xl text-center">
@@ -25,7 +29,7 @@ export function HomePage({
         </CardHeader>
         {/* Add the image below the CardDescription */}
         <img
-          src="../assets/data/1601092.png"
+          src="/public/1601092.png"
           alt="QuantumVote Illustration"
           className="my-6 mx-auto w-48 h-auto"
         />
@@ -33,7 +37,11 @@ export function HomePage({
           <p className="text-sm text-black">
             Your vote is protected with cutting-edge quantum key distribution.
           </p>
-          <Button className="w-full text-white bg-purple-600 hover:bg-purple-700">
+          <Button
+            className="w-full text-white hover:bg-[#00a0a0]"
+            onClick={() => navigate({to: "/parties/2025-05-10"})}  
+            style={{ backgroundColor: "#00c8c8" }}
+          >
             Vote Now
           </Button>
           <a

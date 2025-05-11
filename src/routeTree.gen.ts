@@ -11,11 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TestImport } from './routes/test'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as PartiesPartyIDImport } from './routes/parties.$partyID'
 
 // Create/Update Routes
+
+const TestRoute = TestImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AboutRoute = AboutImport.update({
   id: '/about',
@@ -53,6 +60,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestImport
+      parentRoute: typeof rootRoute
+    }
     '/parties/$partyID': {
       id: '/parties/$partyID'
       path: '/parties/$partyID'
@@ -68,12 +82,14 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/test': typeof TestRoute
   '/parties/$partyID': typeof PartiesPartyIDRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/test': typeof TestRoute
   '/parties/$partyID': typeof PartiesPartyIDRoute
 }
 
@@ -81,27 +97,30 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/test': typeof TestRoute
   '/parties/$partyID': typeof PartiesPartyIDRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/parties/$partyID'
+  fullPaths: '/' | '/about' | '/test' | '/parties/$partyID'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/parties/$partyID'
-  id: '__root__' | '/' | '/about' | '/parties/$partyID'
+  to: '/' | '/about' | '/test' | '/parties/$partyID'
+  id: '__root__' | '/' | '/about' | '/test' | '/parties/$partyID'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  TestRoute: typeof TestRoute
   PartiesPartyIDRoute: typeof PartiesPartyIDRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  TestRoute: TestRoute,
   PartiesPartyIDRoute: PartiesPartyIDRoute,
 }
 
@@ -117,6 +136,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
+        "/test",
         "/parties/$partyID"
       ]
     },
@@ -125,6 +145,9 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/test": {
+      "filePath": "test.tsx"
     },
     "/parties/$partyID": {
       "filePath": "parties.$partyID.tsx"
